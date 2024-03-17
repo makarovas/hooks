@@ -8,22 +8,22 @@ describe('useMap array', () => {
       const { result } = renderHook(() =>
         useMap<number, string>([[1, 'default']])
       );
-      const [, actions] = result.current;
-      expect(result.current[0].get(1)).toBe('default');
+      const [map, actions] = result.current;
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('default');
       // when
       act(() => actions.set(1, 'changed'));
       // then
-      expect(result.current[0].get(1)).toBe('changed');
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('changed');
     });
     it('should add new value', () => {
       // given
       const { result } = renderHook(() => useMap<number, string>());
-      const [, actions] = result.current;
-      expect(result.current[0].get(1)).toBeUndefined();
+      const [map, actions] = result.current;
+      expect(map instanceof Map ? map.get(1) : undefined).toBeUndefined();
       // when
       act(() => actions.set(1, 'added'));
       // then
-      expect(result.current[0].get(1)).toBe('added');
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('added');
     });
   });
 
@@ -33,12 +33,12 @@ describe('useMap array', () => {
       const { result } = renderHook(() =>
         useMap<number, string>([[1, 'existing']])
       );
-      const [, actions] = result.current;
-      expect(result.current[0].get(1)).toBe('existing');
+      const [map, actions] = result.current;
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('existing');
       // when
       act(() => actions.delete(1));
       // then
-      expect(result.current[0].get(1)).toBeUndefined();
+      expect(map instanceof Map ? map.get(1) : undefined).toBeUndefined();
     });
   });
 
@@ -50,12 +50,12 @@ describe('useMap array', () => {
     `('initializes with $message', ({ input }) => {
       // given
       const { result } = renderHook(() => useMap<number, string>());
-      const [, actions] = result.current;
-      expect(result.current[0].get(1)).toBeUndefined();
+      const [map, actions] = result.current;
+      expect(map instanceof Map ? map.get(1) : undefined).toBeUndefined();
       // when
       act(() => actions.init(input));
       // then
-      expect(result.current[0].get(1)).toBe('initialized');
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('initialized');
     });
   });
 
@@ -65,12 +65,12 @@ describe('useMap array', () => {
       const { result } = renderHook(() =>
         useMap<number, string>([[1, 'initialized']])
       );
-      const [, actions] = result.current;
-      expect(result.current[0].get(1)).toBe('initialized');
+      const [map, actions] = result.current;
+      expect(map instanceof Map ? map.get(1) : undefined).toBe('initialized');
       // when
       act(() => actions.clear());
       // then
-      expect(result.current[0].get(1)).toBeUndefined();
+      expect(map instanceof Map ? map.get(1) : undefined).toBeUndefined();
     });
   });
 
@@ -83,10 +83,20 @@ describe('useMap array', () => {
       // when
       act(() => actions.set(1, 1));
       // then
-      expect(originalValueReference).not.toBe(result.current[0]);
-      expect(originalValueReference.get(1)).toBeUndefined();
-      expect(result.current[0].get(1)).toBe(1);
+      const updatedValueReference = result.current[0];
+      expect(originalValueReference).not.toBe(updatedValueReference);
+      expect(
+        originalValueReference instanceof Map
+          ? originalValueReference.get(1)
+          : undefined
+      ).toBeUndefined();
+      expect(
+        updatedValueReference instanceof Map
+          ? updatedValueReference.get(1)
+          : undefined
+      ).toBe(1);
     });
+
     it('should keep actions reference equality after value change', () => {
       // given
       const { result } = renderHook(() => useMap<number, number>());
